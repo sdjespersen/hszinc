@@ -83,7 +83,11 @@ def parse_scalar(scalar, version=LATEST_VER):
             (len(scalar) >= 2) and \
             (scalar[0] in ('"','[','{')) and \
             (scalar[-1] in ('"',']','}')):
-        scalar = json.loads(scalar)
+        try:
+            scalar = json.loads(scalar)
+        except json.decoder.JSONDecodeError:
+            # leave untouched
+            pass
 
     # Simple cases
     if scalar is None:
@@ -105,7 +109,7 @@ def parse_scalar(scalar, version=LATEST_VER):
         return -float('INF')
     elif scalar == 'n:NaN':
         return float('nan')
-    # Conversion to dict of float value turn them into float 
+    # Conversion to dict of float value turn them into float
     # so regex won't work... better just return them
     elif isinstance(scalar, float) or isinstance(scalar, six.integer_types):
         return scalar
